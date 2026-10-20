@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,11 +9,94 @@
 <body>
     <h1>Data Mahasiswa</h1>
 
-    @if ($nim)
-        <p>Filter NIM: {{ $nim }}</p>
-    @else
-        <p>Menampilkan semua data.</p>
+    @if (session('berhasil'))
+        <p>{{ session('berhasil') }}</p>
     @endif
+
+    @if (session('gagal'))
+        <p>{{ session('gagal') }}</p>
+    @endif
+
+    @if ($errors->any())
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    @endif
+
+    <h2>Tambah Mahasiswa</h2>
+
+    <form action="{{ route('mahasiswa.store') }}" method="POST">
+        @csrf
+
+        <p>
+            NIM<br>
+            <input
+                type="text"
+                name="nim"
+                value="{{ old('nim') }}"
+                maxlength="20"
+                required
+            >
+        </p>
+
+        <p>
+            Nama<br>
+            <input
+                type="text"
+                name="nama"
+                value="{{ old('nama') }}"
+                maxlength="100"
+                required
+            >
+        </p>
+
+        <p>
+            Email<br>
+            <input
+                type="email"
+                name="email"
+                value="{{ old('email') }}"
+                maxlength="100"
+                required
+            >
+        </p>
+
+        <p>
+            Usia<br>
+            <input
+                type="number"
+                name="usia"
+                value="{{ old('usia') }}"
+                min="15"
+                max="100"
+                required
+            >
+        </p>
+
+        <p>
+            Program Studi<br>
+            <select name="program_studi_id" required>
+                <option value="">-- Pilih Program Studi --</option>
+
+                @foreach ($daftarProgramStudi as $programStudi)
+                    <option
+                        value="{{ $programStudi['program_studi_id'] }}"
+                        @selected(
+                            old('program_studi_id') == $programStudi['program_studi_id']
+                        )
+                    >
+                        {{ $programStudi['nama_program_studi'] }}
+                    </option>
+                @endforeach
+            </select>
+        </p>
+
+        <button type="submit">Tambah Data</button>
+    </form>
+
+    <h2>Daftar Mahasiswa</h2>
 
     <table border="1" cellpadding="6" cellspacing="0">
         <thead>
@@ -24,6 +108,7 @@
                 <th>Program Studi</th>
             </tr>
         </thead>
+
         <tbody>
             @forelse ($daftarMahasiswa as $mahasiswa)
                 <tr>
@@ -35,14 +120,10 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5">Data tidak ditemukan.</td>
+                    <td colspan="5">Data belum tersedia.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
-
-    @if ($nim)
-        <p><a href="{{ url('/mahasiswa') }}">Tampilkan semua data</a></p>
-    @endif
 </body>
 </html>
